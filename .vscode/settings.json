@@ -1,0 +1,21 @@
+{
+  "files.associations": {
+    "*.jsx": "javascriptreact"
+  },
+  "tailwindCSS.experimental.classRegex": [
+    [
+      "clsx\\(([^)]*)\\)",
+      "(?:'|\"|`)([^']*)(?:'|\"|`)"
+    ],
+    [
+      "cn\\(([^)]*)\\)",
+      "(?:'|\"|`)([^']*)(?:'|\"|`)"
+    ]
+  ],
+  "editor.quickSuggestions": {
+    "strings": true
+  },
+  "github.copilot.enable": {
+    "*": true
+  }
+}
