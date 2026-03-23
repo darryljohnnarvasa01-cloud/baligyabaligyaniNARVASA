@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link, Navigate, useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import { ArrowRight } from 'lucide-react'
-import useAuth, { getHomePathForRole } from '../../hooks/useAuth'
+import useAuth, { getPostAuthPath } from '../../hooks/useAuth'
 import AuthField from '../../components/auth/AuthField'
 import AuthShell from '../../components/auth/AuthShell'
 import GoogleSignInButton from '../../components/auth/GoogleSignInButton'
@@ -19,6 +19,7 @@ export default function RegisterPage() {
     isAuthenticated,
     isReady,
     role,
+    user,
     signUp,
     signInWithGoogle,
     registerMutation,
@@ -53,7 +54,7 @@ export default function RegisterPage() {
   }
 
   if (isAuthenticated) {
-    return <Navigate to={getHomePathForRole(role)} replace />
+    return <Navigate to={getPostAuthPath(user, role)} replace />
   }
 
   const onChange = (key) => (event) => {
@@ -80,8 +81,12 @@ export default function RegisterPage() {
   const handleGoogleSignIn = async (credential) => {
     try {
       const response = await signInWithGoogle(credential)
-      toast.success('Signed in with Google.')
-      navigate(getHomePathForRole(response?.data?.role ?? null), {
+      const nextUser = response?.data?.user ?? null
+      const nextRole = response?.data?.role ?? null
+      const needsPasswordSetup = Boolean(nextUser?.password_setup_required)
+
+      toast.success(needsPasswordSetup ? 'Google account created. Set a password to finish signup.' : 'Signed in with Google.')
+      navigate(getPostAuthPath(nextUser, nextRole), {
         replace: true,
       })
     } catch (error) {

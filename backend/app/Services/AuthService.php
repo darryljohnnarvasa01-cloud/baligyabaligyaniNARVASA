@@ -38,6 +38,7 @@ class AuthService
             'is_active' => true,
             'email_verified_at' => null,
             'password' => $payload['password'],
+            'password_set_at' => Carbon::now(),
         ]);
 
         $user->syncRoles(['customer']);
@@ -182,6 +183,7 @@ class AuthService
                     'is_active' => true,
                     'email_verified_at' => Carbon::now(),
                     'password' => Str::password(32),
+                    'password_set_at' => null,
                 ]);
 
                 $user->syncRoles(['customer']);
@@ -278,12 +280,14 @@ class AuthService
      */
     public function changePassword(User $user, array $payload): bool
     {
-        if (! Hash::check($payload['current_password'], $user->password)) {
+        if ($user->requiresCurrentPasswordForPasswordChange()
+            && ! Hash::check((string) ($payload['current_password'] ?? ''), $user->password)) {
             return false;
         }
 
         $user->forceFill([
             'password' => $payload['new_password'],
+            'password_set_at' => Carbon::now(),
         ])->save();
 
         return true;
